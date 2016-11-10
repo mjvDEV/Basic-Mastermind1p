@@ -17,8 +17,7 @@ using namespace std;
 // Return: nothing.
 ////////////////////////////////////////////////////////////////////
 
-void getGuess(int guesses[8][6], int turn, int diff)
-{
+void getGuess(int guesses[8][6], int turn, int diff) {
 	bool success = false;
 	char input[100];
 	while (!success) {
@@ -32,7 +31,7 @@ void getGuess(int guesses[8][6], int turn, int diff)
 				success = false;
 			}
 			else if ( 	(guesses[turn][i] < 0)	||
-					  	(guesses[turn][i] > 9)	) {
+					(guesses[turn][i] > 9)	) {
 				success = false;
 			}
 		}
@@ -53,8 +52,7 @@ void getGuess(int guesses[8][6], int turn, int diff)
 // Return: nothing.
 ////////////////////////////////////////////////////////////////////
 
-void showResults(int rW[], int rP[], int turn)
-{
+void showResults(int rW[], int rP[], int turn) {
 	for (int c = 0; c < rW[turn]; c++) {
 		cout << "X ";
 	}
@@ -80,15 +78,12 @@ void showResults(int rW[], int rP[], int turn)
 // Return: nothing.
 ////////////////////////////////////////////////////////////////////
 
-void Display(int guesses[8][6], int turn, int diff, int rW[], int rP[], char* player)
-{
+void Display(int guesses[8][6], int turn, int diff, int rW[], int rP[], char* player) {
 	cout << "\n********************************************" << endl
 		<< player << ", here are your guesses so far: " << endl;
-	for (int a = 0; a < turn; a++)
-	{
+	for (int a = 0; a < turn; a++) {
 		cout << a + 1 << ".  ";
-		for (int b = 0; b < diff; b++)
-		{
+		for (int b = 0; b < diff; b++) {
 			cout << guesses[a][b] << " ";
 		}
 		cout << " ---  Scored: ";
@@ -111,17 +106,13 @@ void Display(int guesses[8][6], int turn, int diff, int rW[], int rP[], char* pl
 // Return: nothing.
 ////////////////////////////////////////////////////////////////////
 
-void analyze(int guesses[8][6], int answer[], int turn, int diff, int rW[], int rP[])
-{
+void analyze(int guesses[8][6], int answer[], int turn, int diff, int rW[], int rP[]) {
 	// Check for wholly correct digits first.
 	// go through this turn's guess one digit at a time.
-	for (int x = 0; x < diff; x++)
-	{
-		if (guesses[turn][x] >= 0 && guesses[turn][x] < 10)
-		{
+	for (int x = 0; x < diff; x++)	{
+		if (guesses[turn][x] >= 0 && guesses[turn][x] < 10) {
 			// Check whether the current digit is wholly correct (correct digit, correct spot)
-			if (guesses[turn][x] == answer[x])
-			{
+			if (guesses[turn][x] == answer[x]) {
 				rW[turn]++;
 				// change answer and guess digits so that they won't return false results later this turn. 
 				answer[x] += 10;
@@ -131,16 +122,12 @@ void analyze(int guesses[8][6], int answer[], int turn, int diff, int rW[], int 
 	}
 	// Now check for partially correct digits.
 	// go through this turn's guess one digit at a time.
-	for (int a = 0; a < diff; a++)
-	{
+	for (int a = 0; a < diff; a++) {
 		bool found = false; // used to exit loop once digit is found to prevent doubling of results.
 		// Only check against solution if the digit is within the acceptable bounds (0 through 9).
-		if (guesses[turn][a] >= 0 && guesses[turn][a] < 10)
-		{
-			for (int b = 0; (b < diff && !found); b++)
-			{
-				if (guesses[turn][a] == answer[b])
-				{
+		if (guesses[turn][a] >= 0 && guesses[turn][a] < 10) {
+			for (int b = 0; (b < diff && !found); b++) {
+				if (guesses[turn][a] == answer[b]) {
 					rP[turn]++;
 					// Change answer digit so it won't return false results later.
 					answer[b] += 10;
@@ -150,14 +137,11 @@ void analyze(int guesses[8][6], int answer[], int turn, int diff, int rW[], int 
 		}
 	}
 	// Reset all digits for use again next turn / in main.
-	for (int c = 0; c < diff; c++)
-	{
-		if (answer[c] > 9)
-		{
+	for (int c = 0; c < diff; c++) {
+		if (answer[c] > 9) {
 			answer[c] -= 10;
 		}
-		if (guesses[turn][c] > 9)
-		{
+		if (guesses[turn][c] > 9) {
 			guesses[turn][c] -= 10;
 		}
 	}
@@ -178,19 +162,16 @@ void analyze(int guesses[8][6], int answer[], int turn, int diff, int rW[], int 
 // Return: true if the player won on this round, false otherwise.
 ////////////////////////////////////////////////////////////////////
 
-bool pTurn(int guesses[8][6], int answer[], int turn, int diff, int rW[], int rP[], char* player)
-{
+bool pTurn(int guesses[8][6], int answer[], int turn, int diff, int rW[], int rP[], char* player) {
 	bool win = false;
 
-	if (turn > 0)
-	{
+	if (turn > 0) {
 		Display(guesses, turn, diff, rW, rP, player);
 	}
 	getGuess(guesses, turn, diff);
 	analyze(guesses, answer, turn, diff, rW, rP);
 
-	if (rW[turn] == diff)
-	{
+	if (rW[turn] == diff) {
 		win = true;
 	}
 	return win;
@@ -206,10 +187,8 @@ bool pTurn(int guesses[8][6], int answer[], int turn, int diff, int rW[], int rP
 // Return: nothing.
 ////////////////////////////////////////////////////////////////////
 
-void setAnswer(int answer[], int diff)
-{
-	for (int a = 0; a < diff; a++)
-	{
+void setAnswer(int answer[], int diff) {
+	for (int a = 0; a < diff; a++) {
 		answer[a] = rand() % 10;
 	}
 }
@@ -223,7 +202,7 @@ void setAnswer(int answer[], int diff)
 // Return: nothing.
 ////////////////////////////////////////////////////////////////////
 
-void printRules(){
+void printRules() {
 	cout << endl
 		<< "*******************************" << endl
 		<< "  Welcome to Basic MasterMind  " << endl
@@ -278,10 +257,8 @@ int getDiff() {
 ////////////////////////////////////////////////////////////////////
 
 void resetVars(int guesses[8][6], int rW[8], int rP[8]) {
-	for (int i = 0; i < 8; i++)
-	{
-		for (int j = 0; j < 6; j++)
-		{
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 6; j++) {
 			guesses[i][j] = 0;
 		}
 		rW[i] = 0;
@@ -300,8 +277,7 @@ void resetVars(int guesses[8][6], int rW[8], int rP[8]) {
 
 void printAnswer(int answer[6], int diff) {
 	cout << "The correct solution was: ";
-	for (int e = 0; e < diff; e++)
-	{
+	for (int e = 0; e < diff; e++) {
 		cout << answer[e] << " ";
 	}
 	cout << endl;
@@ -318,8 +294,7 @@ void printAnswer(int answer[6], int diff) {
 
 void printFinalGuess(int guess[6], int diff) {
 	cout << "Your final guess was: ";
-	for (int i = 0; i < diff; i++)
-	{
+	for (int i = 0; i < diff; i++) {
 		cout << guess[i] << " ";
 	}
 	cout << endl << endl;
@@ -334,8 +309,7 @@ void printFinalGuess(int guess[6], int diff) {
 // Return: 0.
 ////////////////////////////////////////////////////////////////////
 
-int main()
-{
+int main() {
 	srand(time(NULL)); // used for random number generation.
 
 	int guesses[8][6], answer[6], turn, diff;
@@ -348,8 +322,7 @@ int main()
 	cout << "Greetings, master, what is your name? ";
 	cin.getline(player,1000);
 	printRules();
-	do
-	{
+	do {
 		// Variable initialization.
 		diff = getDiff();
 		resetVars(guesses, rW, rP);
@@ -360,20 +333,17 @@ int main()
 		// which are then analyzed and the results shown along with all previous
 		// guesses and corresponding results. Loop exits after 8 turns or if the
 		// player wins.
-		for (turn = 0; turn < 8 && !win; turn++)
-		{
+		for (turn = 0; turn < 8 && !win; turn++) {
 			win = pTurn(guesses, answer, turn, diff, rW, rP, player);
 		}
 
 		printAnswer(answer, diff);
 		printFinalGuess(guesses[turn - 1], diff);
 
-		if (win)
-		{
+		if (win) {
 			cout << "Congratulations, " << player << "! You won!" << endl << endl;
 		}
-		else
-		{
+		else {
 			cout << "Aww too bad, " << player << ", you lost." << endl << endl;
 		}
 
