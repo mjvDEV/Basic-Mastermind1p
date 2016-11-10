@@ -2,6 +2,7 @@
 #include <cstdlib>		//This and time.h used for random number generation.
 #include <time.h>
 #include <cstring>
+#include <sstream>
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////
@@ -18,30 +19,26 @@ using namespace std;
 
 void getGuess(int guesses[8][6], int turn, int diff)
 {
-	char x;
-	bool check = false, invalid;
-	while (!check)
-	{
-		invalid = false;
+	bool success = false;
+	char input[100];
+	while (!success) {
+		success = true;
 		cout << "Enter a guess: ";
-		for (int c = 0; c < diff; c++)
-		{
-			cin >> ws;
-			cin.get(x);
-			if (isdigit(x)) {
-				guesses[turn][c] = x - 48;
-				check = true;
+		cin.getline(input, 100);
+		stringstream buffer(input);
+
+		for (int i = 0; i < diff; i++) {
+			if ( !(buffer >> guesses[turn][i]) ) {
+				success = false;
 			}
-			else {
-				invalid = true;
-				break;
+			else if ( 	(guesses[turn][i] < 0)	||
+					  	(guesses[turn][i] > 9)	) {
+				success = false;
 			}
 		}
-		if (invalid) {
-			cout << "Invalid input. Please try again.\n";
-			check = false;
+		if (!success) {
+			cout << "Invalid input. Plese try again.\n";
 		}
-		cin.sync();
 	}
 }
 
@@ -200,7 +197,7 @@ bool pTurn(int guesses[8][6], int answer[], int turn, int diff, int rW[], int rP
 }
 
 ////////////////////////////////////////////////////////////////////
-// Algorithm getAnswer(answer, diff)
+// Algorithm setAnswer(answer, diff)
 // 	collects an answer for the other player to guess. 
 //
 // Pre: answer :: int. Stores the solution, for comparison against the guess.
@@ -209,12 +206,123 @@ bool pTurn(int guesses[8][6], int answer[], int turn, int diff, int rW[], int rP
 // Return: nothing.
 ////////////////////////////////////////////////////////////////////
 
-void getAnswer(int answer[], int diff)
+void setAnswer(int answer[], int diff)
 {
 	for (int a = 0; a < diff; a++)
 	{
 		answer[a] = rand() % 10;
 	}
+}
+
+////////////////////////////////////////////////////////////////////
+// Algorithm printRules()
+//  prints the rules of the game.
+//
+// Pre: nothing.
+// Post: nothing.
+// Return: nothing.
+////////////////////////////////////////////////////////////////////
+
+void printRules(){
+	cout << endl
+		<< "*******************************" << endl
+		<< "  Welcome to Basic MasterMind  " << endl
+		<< "*******************************" << endl
+		<< "RULES:" << endl
+		<< "1. The object of the game is to correctly guess a code." << endl
+		<< "    - The code will contain digits from 0 through 9." << endl
+		<< "2. The code will consist of 4-6 digits, based on which difficulty is selected." << endl
+		<< "3. You will have 8 turns to correctly guess the code." << endl
+		<< "4. Each guess will be scored as follows: " << endl
+		<< "    - X: One X for each correct digit that is also in the correct spot." << endl
+		<< "    - O: One O for each correct digit that is in the wrong spot." << endl
+		<< "**************" << endl
+		<< "  Good luck!  " << endl
+		<< "**************" << endl << endl;
+}
+
+////////////////////////////////////////////////////////////////////
+// Algorithm getDiff()
+//  collects the user selected difficulty from the console.
+//
+// Pre: nothing.
+// Post: nothing.
+// Return: diff >= 4, diff <= 6
+////////////////////////////////////////////////////////////////////
+
+int getDiff() {
+	char input[100];
+	int diff;
+	while (true) {
+		cout << "Select difficulty: (4,5,6): ";
+		cin.getline(input, 100);
+		stringstream buffer(input);
+		if (buffer >> diff) {
+			if ( (diff >= 4) && (diff <= 6) ) {
+				break;
+			}
+		}
+		cout << "Invalid input. Please try again.\n";
+	}
+	return diff;
+}
+
+////////////////////////////////////////////////////////////////////
+// Algorithm resetVars(guesses, rW, rP)
+//
+// Pre: guesses :: 2D int array. The player's guesses.
+//		rW :: 1D int array. The number of wholly correct digits in each guess.
+//		rP :: 1D int array. The number of partially correct digits in each guess.
+// Post: All values in input arrays set to 0.
+// Return: nothing.
+////////////////////////////////////////////////////////////////////
+
+void resetVars(int guesses[8][6], int rW[8], int rP[8]) {
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 6; j++)
+		{
+			guesses[i][j] = 0;
+		}
+		rW[i] = 0;
+		rP[i] = 0;
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+// Algorithm printAnswer(answer, diff)
+//
+// Pre: answer :: int. Stores the solution, for comparison against the guess.
+//		diff :: int. keeps track of the user selected difficulty.
+// Post: answer printed to console.
+// Return: nothing.
+////////////////////////////////////////////////////////////////////
+
+void printAnswer(int answer[6], int diff) {
+	cout << "The correct solution was: ";
+	for (int e = 0; e < diff; e++)
+	{
+		cout << answer[e] << " ";
+	}
+	cout << endl;
+}
+
+////////////////////////////////////////////////////////////////////
+// Algorithm printFinalGuess(guess, diff)
+//
+// Pre: guess :: int array, the final guess.
+//		diff :: int. keeps track of the user selected difficulty.
+// Post: guess printed to console.
+// Return: nothing.
+////////////////////////////////////////////////////////////////////
+
+void printFinalGuess(int guess[6], int diff) {
+	cout << "Your final guess was: ";
+	for (int i = 0; i < diff; i++)
+	{
+		cout << guess[i] << " ";
+	}
+	cout << endl << endl;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -230,79 +338,23 @@ int main()
 {
 	srand(time(NULL)); // used for random number generation.
 
-	int guesses[8][6], answer[6], turn, diff, failSafe;
+	int guesses[8][6], answer[6], turn, diff;
 	int rW[8], rP[8];
-	char test = 'y'; // used to allow players to rematch without rebooting program.
+	char play = 'y'; // used to allow players to rematch without rebooting program.
 	char player[1000];
-	char x; // throwaway character for safe integer input.
+	char input[100];
 	bool win, check;
 
 	cout << "Greetings, master, what is your name? ";
 	cin.getline(player,1000);
-	cin.sync();
-
+	printRules();
 	do
 	{
-		cout << endl << endl
-			<< "*******************************" << endl
-			<< "  Welcome to Basic MasterMind  " << endl
-			<< "*******************************" << endl
-			<< "RULES:" << endl
-			<< "1. The object of the game is to correctly guess a code." << endl
-			<< "    - The code will contain digits from 0 through 9." << endl
-			<< "2. The code will consist of 4-6 digits, based on which difficulty is selected." << endl
-			<< "3. You will have 8 turns to correctly guess the code." << endl
-			<< "4. Each guess will be scored as follows: " << endl
-			<< "    - X: One X for each correct digit that is also in the correct spot." << endl
-			<< "    - O: One O for each correct digit that is in the wrong spot." << endl
-			<< "**************" << endl
-			<< "  Good luck!  " << endl
-			<< "**************" << endl << endl;
-
-		failSafe = 0;
-		check = false;
-		do
-		{
-			cout << "Select difficulty (4,5,6): ";
-			cin.get(x);
-			if (isdigit(x)) {
-				diff = x - 48;
-				if (diff >= 4 && diff <= 6) {
-					check = true;
-				}
-				else {
-					check = false;
-				}
-			}
-			else {
-				check = false;
-			}
-			if (!check) {
-				cout << "Invalid input, please try again.\n";
-			}
-			cin.sync();
-			failSafe += 1;
-		} while (!check && failSafe < 10);
-		cout << endl << endl;
-
-		if (failSafe > 9) {
-			cout << "Program failed due to input error. Application will now close.";
-			return 0;
-		}
-
-		// reset variables (so game is replayable).
-		for (int i = 0; i < 8; i++)
-		{
-			for (int j = 0; j < 6; j++)
-			{
-				guesses[i][j] = 0;
-			}
-			rW[i] = 0;
-			rP[i] = 0;
-		}
+		// Variable initialization.
+		diff = getDiff();
+		resetVars(guesses, rW, rP);
 		win = false;
-			
-		getAnswer(answer, diff);
+		setAnswer(answer, diff);
 
 		// The actual gameplay portion. Player inputs their guesses one at a time,
 		// which are then analyzed and the results shown along with all previous
@@ -310,23 +362,11 @@ int main()
 		// player wins.
 		for (turn = 0; turn < 8 && !win; turn++)
 		{
-				win = pTurn(guesses, answer, turn, diff, rW, rP, player);
-				cout << endl;
+			win = pTurn(guesses, answer, turn, diff, rW, rP, player);
 		}
 
-		cout << "The correct solution was: ";
-		for (int e = 0; e < diff; e++)
-		{
-			cout << answer[e] << " ";
-		}
-		cout << endl << endl;
-
-		cout << "Your final guess was: ";
-		for (int f = 0; f < diff; f++)
-		{
-			cout << guesses[turn - 1][f] << " ";
-		}
-		cout << endl << endl;
+		printAnswer(answer, diff);
+		printFinalGuess(guesses[turn - 1], diff);
 
 		if (win)
 		{
@@ -338,9 +378,9 @@ int main()
 		}
 
 		cout << "Would you like to play again? (y/n): ";
-		cin.get(test);
-		cin.sync();
-	} while (test != 'n');
+		cin.getline(input, 100);
+		play = input[0];
+
+	} while (play != 'n');
 	return 0;
 }
-
